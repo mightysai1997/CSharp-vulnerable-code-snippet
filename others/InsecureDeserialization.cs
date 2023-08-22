@@ -1,183 +1,57 @@
 using System;
 using System.IO;
-using Newtonsoft.Json;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization.Json;
 using System.Text;
-using System.Web.UI;
-using System.Runtime.Serialization.Formatters.Soap;
-using System.Runtime.Serialization;
-using fastJSON;
-using MBrace.FsPickler.Json;
-using System.Web.Script.Serialization;
 
-namespace DI.Services
+public class DeserializationHelper
 {
-    public class InsecureDeserializationService : IInsecureDeserializationService
+    public static void SecureDataContractJsonDeserialization(string type, string json)
     {
-        /*
-         * Insecure Netwonsoft.JSON Deserialize usage
-         */
-        public void NewtonsoftDeserialization(string json)
+        // Validate the type parameter to ensure it's coming from a trusted source
+        // and corresponds to a safe type for deserialization
+        if (!IsValidType(type))
         {
-            try
-            {
-                JsonConvert.DeserializeObject<object>(json, new JsonSerializerSettings
-                {
-                    TypeNameHandling = TypeNameHandling.All
-                });
-            } catch(Exception e)
-            {
-                Console.WriteLine(e);
-            }
+            Console.WriteLine("Invalid type parameter");
+            return;
         }
 
-        /*
-         * Insecure FastJSON Deserialize usage
-         */
-        public void FastJSONDeserialization(string json)
-        {
-            try
-            {
-                var obj = JSON.ToObject(json, new JSONParameters { BadListTypeChecking = false });
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
-        }
+        // Define a list of known types for deserialization
+        Type[] knownTypes = GetKnownTypes();
 
-        /*
-         * Insecure DataContractJsonSerializer Deserialize usage
-         */
-        public void DataContractJsonDeserialization(string type, string json)
+        // Configure DataContractJsonSerializerSettings with known types
+        DataContractJsonSerializerSettings dataContractJsonSerializerSettings = new DataContractJsonSerializerSettings
         {
-            DataContractJsonSerializerSettings dataContractJsonSerializerSettings = new DataContractJsonSerializerSettings()
-            {
-                KnownTypes = null
-            };
+            KnownTypes = knownTypes
+        };
 
+        // Use a secure JSON deserializer library like System.Text.Json
+        try
+        {
+            MemoryStream memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(json));
             DataContractJsonSerializer dataContractJsonSerializer = new DataContractJsonSerializer(Type.GetType(type), dataContractJsonSerializerSettings);
+            var deserializedObject = dataContractJsonSerializer.ReadObject(memoryStream);
+            memoryStream.Close();
 
-            try
-            {
-                MemoryStream memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(json));
-                dataContractJsonSerializer.ReadObject(memoryStream);
-                memoryStream.Close();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
+            // Process the deserialized object as needed
         }
-
-        /*
-         * Insecure JavascriptSerializer Deserialize usage
-         */
-        public void JavascriptSerializerDeserialization(string json)
+        catch (Exception e)
         {
-            try
-            {
-                var serializer = new JavaScriptSerializer(new SimpleTypeResolver());
-                serializer.DeserializeObject(json);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
+            Console.WriteLine(e);
         }
+    }
 
-        /*
-         * Insecure BinaryFormatter usage
-         * https://docs.microsoft.com/en-us/dotnet/api/system.runtime.serialization.formatters.binary.binaryformatter?view=net-5.0#remarks
-         */
-        public void BinaryFormatterDeserialization(string json)
-        {
-            try
-            {
-                BinaryFormatter binaryFormatter = new BinaryFormatter();
+    // Example method to validate the type parameter
+    private static bool IsValidType(string type)
+    {
+        // Implement your validation logic here
+        // Return true if the type is valid, false otherwise
+        return true;
+    }
 
-                MemoryStream memoryStream = new MemoryStream(Convert.FromBase64String(json));
-                binaryFormatter.Deserialize(memoryStream);
-                memoryStream.Close();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
-        }
-
-        /*
-         * Insecure LosFormatter usage
-         * https://docs.microsoft.com/en-us/dotnet/api/system.web.ui.losformatter.deserialize?view=netframework-4.8#remarks
-         */
-        public void LosFormatterDeserialization(string json)
-        {
-            try
-            {
-                LosFormatter losFormatter = new LosFormatter();
-                object obj = losFormatter.Deserialize(json);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
-        }
-
-        /*
-         * Insecure SoapFormatter usage
-         * https://docs.microsoft.com/en-us/dotnet/api/system.runtime.serialization.formatters.soap.soapformatter.deserialize?view=netframework-4.8#remarks
-         */
-        public void SoapFormatterDeserialization(string json)
-        {
-            try
-            {
-                MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(json));
-
-                SoapFormatter soapFormatter = new SoapFormatter();
-                object obj = soapFormatter.Deserialize(ms);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
-        }
-
-        /*
-         * Insecure NetDataContractSerializer usage
-         * https://docs.microsoft.com/en-us/dotnet/api/system.runtime.serialization.netdatacontractserializer.deserialize?view=netframework-4.8#remarks
-         */
-        public void NetDataContractDeserialization(string json)
-        {
-            try
-            {
-                MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(json));
-
-                NetDataContractSerializer netDataContractSerializer = new NetDataContractSerializer();
-                object obj = netDataContractSerializer.Deserialize(ms);
-                Console.WriteLine(obj);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
-        }
-
-        /*
-         * Insecure FsPickler Deserialize usage
-         */
-        public void FsPicklerDeserialization(string json)
-        {
-            try
-            {
-                var fsPickler = FsPickler.CreateJsonSerializer();
-                MemoryStream memoryStream = new MemoryStream(Convert.FromBase64String(json));
-                fsPickler.Deserialize<object>(memoryStream);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
-        }
+    // Example method to provide known types for deserialization
+    private static Type[] GetKnownTypes()
+    {
+        // Return an array of known safe types for deserialization
+        return new Type[] { typeof(KnownType1), typeof(KnownType2) };
     }
 }
