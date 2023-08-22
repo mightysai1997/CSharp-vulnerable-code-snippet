@@ -10,4 +10,9 @@ public class PrivateInformationHandler : IHttpHandler
         string address = ctx.Request.QueryString["Address1"];
         logger.Info("User has address: " + address);
     }
+	
+	    public bool IsReusable
+    {
+        get { return false; }
+    }
 }
