@@ -1,30 +1,29 @@
 using System;
-using System.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
+using RazorLight;
 
-namespace SQLInjectionExample
+namespace SSTIExample
 {
     class Program
     {
         static void Main(string[] args)
         {
-            Console.Write("Enter a username: ");
-            string username = Console.ReadLine();
+            Console.Write("Enter a template expression: ");
+            string templateExpression = Console.ReadLine();
 
-            string connectionString = "Data Source=your_server;Initial Catalog=your_database;Integrated Security=True";
-            SqlConnection connection = new SqlConnection(connectionString);
-            connection.Open();
+            string template = $"Hello, @(Model.{templateExpression})!";
+            string result = RenderTemplate(template, new { Name = "User" });
 
-            string query = "SELECT * FROM Users WHERE Username = '" + username + "'";
-            SqlCommand command = new SqlCommand(query, connection);
-            SqlDataReader reader = command.ExecuteReader();
+            Console.WriteLine("Rendered template:");
+            Console.WriteLine(result);
+        }
 
-            while (reader.Read())
-            {
-                Console.WriteLine("User found: " + reader["Username"]);
-            }
-
-            reader.Close();
-            connection.Close();
+        static string RenderTemplate(string template, object model)
+        {
+            IConfigurationRoot configuration = new ConfigurationBuilder().Build();
+            IRazorLightEngine engine = EngineFactory.CreatePhysical(configuration);
+            
+            return engine.CompileRenderAsync("templateKey", template, model).Result;
         }
     }
 }
