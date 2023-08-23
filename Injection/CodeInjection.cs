@@ -1,29 +1,47 @@
 using System;
-using Microsoft.Extensions.Configuration;
-using RazorLight;
+using System.CodeDom.Compiler;
+using Microsoft.CSharp;
 
-namespace SSTIExample
+class Program
 {
-    class Program
+    static void Main()
     {
-        static void Main(string[] args)
+        Console.Write("Enter a class name: ");
+        string className = Console.ReadLine();
+
+        string maliciousCode = @"
+            using System;
+            namespace MaliciousCode
+            {
+                class " + className + @"
+                {
+                    public static void MaliciousMethod()
+                    {
+                        Console.WriteLine(""Malicious method executed!"");
+                    }
+                }
+            }";
+
+        CSharpCodeProvider provider = new CSharpCodeProvider();
+        CompilerParameters parameters = new CompilerParameters();
+        parameters.GenerateExecutable = false;
+        parameters.GenerateInMemory = true;
+
+        CompilerResults results = provider.CompileAssemblyFromSource(parameters, maliciousCode);
+
+        if (!results.Errors.HasErrors)
         {
-            Console.Write("Enter a template expression: ");
-            string templateExpression = Console.ReadLine();
-
-            string template = $"Hello, @(Model.{templateExpression})!";
-            string result = RenderTemplate(template, new { Name = "User" });
-
-            Console.WriteLine("Rendered template:");
-            Console.WriteLine(result);
+            Type type = results.CompiledAssembly.GetType("MaliciousCode." + className);
+            var method = type.GetMethod("MaliciousMethod");
+            method.Invoke(null, null);
         }
-
-        static string RenderTemplate(string template, object model)
+        else
         {
-            IConfigurationRoot configuration = new ConfigurationBuilder().Build();
-            IRazorLightEngine engine = EngineFactory.CreatePhysical(configuration);
-            
-            return engine.CompileRenderAsync("templateKey", template, model).Result;
+            Console.WriteLine("Code compilation failed:");
+            foreach (CompilerError error in results.Errors)
+            {
+                Console.WriteLine(error.ErrorText);
+            }
         }
     }
 }
