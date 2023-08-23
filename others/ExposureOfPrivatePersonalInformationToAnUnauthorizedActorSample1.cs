@@ -1,29 +1,33 @@
 using System;
-namespace PrivateInfoExposureExample
+
+namespace UserAuthentication
 {
-    class Program
+    public class UserController
     {
-        static void Main(string[] args)
+        public string AuthenticateUser(string username, string password)
         {
-            string username = "alice";
-            string password = "mysecretpassword";
-
- 
-
-            Console.WriteLine("Welcome, " + username + "!");
-            Console.WriteLine("Please enter your password: ");
-            string userInputPassword = Console.ReadLine();
-
- 
-
-            if (userInputPassword == password)
+            // Simplified authentication logic
+            if (username == "admin" && password == "admin123")
             {
-                Console.WriteLine("Access granted. Your account balance is $1000.");
+                return "Welcome, admin!";
             }
             else
             {
-                Console.WriteLine("Access denied. Invalid password.");
+                return "Login failed";
             }
+        }
+    }
+    
+    public class MainApp
+    {
+        public static void Main(string[] args)
+        {
+            UserController userController = new UserController();
+            string username = Console.ReadLine();
+            string password = Console.ReadLine();
+
+            string authenticationResult = userController.AuthenticateUser(username, password);
+            Console.WriteLine(authenticationResult);
         }
     }
 }
