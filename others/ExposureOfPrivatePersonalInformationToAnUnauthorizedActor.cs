@@ -14,3 +14,39 @@ public class PrivateInformationHandler : IHttpHandler
         get { return false; }
     }
 }
+using System;
+
+ 
+
+namespace PrivacyViolationExample
+{
+    class Program
+    {
+        private static string sensitiveData = "This is a secret.";
+
+ 
+
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Welcome to our application!");
+            Console.WriteLine("Please enter your name: ");
+            string userName = Console.ReadLine();
+
+ 
+
+            if (userName == "admin")
+            {
+                Console.WriteLine("Hello, admin!");
+                Console.WriteLine("Here's some sensitive data for you: " + sensitiveData);
+            }
+            else
+            {
+                Console.WriteLine("Hello, " + userName + "!");
+            }
+
+ 
+
+            Console.WriteLine("Thank you for using our application.");
+        }
+    }
+}
