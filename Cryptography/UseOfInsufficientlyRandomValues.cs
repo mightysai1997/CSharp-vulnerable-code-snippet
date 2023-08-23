@@ -1,12 +1,15 @@
-using System;
+package main
 
-class Program
-{
-    static void Main()
-    {
-        var random = new Random();             // Sensitive use of Random
-        byte[] data = new byte[16];
-        random.NextBytes(data);
-        return BitConverter.ToString(data);   
-    }
+import (
+	"math/rand"
+)
+
+var charset = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+
+func generatePassword() string {
+	s := make([]rune, 20)
+	for i := range s {
+		s[i] = charset[rand.Intn(len(charset))]
+	}
+	return string(s)
 }
