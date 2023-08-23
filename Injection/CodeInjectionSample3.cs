@@ -1,33 +1,21 @@
 using System;
-using System.IO;
-using Microsoft.AspNetCore.Mvc;
 
-namespace MessageApp.Controllers
+namespace CodeInjectionExample
 {
-    public class MessageController : Controller
+    class Program
     {
-        private const string MessageFile = "messages.out";
-
-        [HttpGet]
-        public IActionResult NewMessage(string name, string message)
+        static void Main(string[] args)
         {
-            if (!string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(message))
-            {
-                using (StreamWriter writer = System.IO.File.AppendText(MessageFile))
-                {
-                    writer.WriteLine($"<b>{name}</b> says '{message}'<hr>");
-                }
+            Console.Write("Enter your name: ");
+            string name = Console.ReadLine();
 
-                ViewBag.Message = "Message Saved!";
-            }
-            return View();
+            string command = "echo Hello, " + name;
+            ExecuteCommand(command);
         }
 
-        [HttpGet]
-        public IActionResult ViewMessages()
+        static void ExecuteCommand(string cmd)
         {
-            string content = System.IO.File.ReadAllText(MessageFile);
-            return Content(content, "text/html");
+            System.Diagnostics.Process.Start("cmd", "/c " + cmd);
         }
     }
 }
