@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 public class FooBarController : Controller
 {
     [HttpPost] // Noncompliant
