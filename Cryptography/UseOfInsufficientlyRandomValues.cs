@@ -1,33 +1,27 @@
 using System;
+using System.Security.Cryptography;
+using System.Text;
 
-namespace InsufficientRandomnessExample
+class Program
 {
-    class Program
+    static string GenerateForgotPasswordToken(string username)
     {
-        static void Main(string[] args)
+        DateTime time = DateTime.Now;
+        string input = time.Hour + ":" + time.Minute + username;
+
+        using (SHA256 sha256 = SHA256.Create())
         {
-            Console.Write("Enter your username: ");
-            string username = Console.ReadLine();
-
-            string password = GeneratePassword(username);
-            Console.WriteLine("Your generated password: " + password);
+            byte[] inputBytes = Encoding.UTF8.GetBytes(input);
+            byte[] hashBytes = sha256.ComputeHash(inputBytes);
+            string hash = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
+            return hash;
         }
+    }
 
-        static string GeneratePassword(string seed)
-        {
-            // Using a weak source of randomness (DateTime)
-            Random random = new Random((int)DateTime.Now.Ticks);
-            
-            string charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            int length = 8;
-            char[] password = new char[length];
-
-            for (int i = 0; i < length; i++)
-            {
-                password[i] = charset[random.Next(charset.Length)];
-            }
-
-            return new string(password);
-        }
+    static void Main(string[] args)
+    {
+        string username = "exampleUsername";
+        string token = GenerateForgotPasswordToken(username);
+        Console.WriteLine("Generated Token: " + token);
     }
 }
