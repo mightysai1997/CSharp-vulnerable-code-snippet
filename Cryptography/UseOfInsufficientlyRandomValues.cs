@@ -1,9 +1,10 @@
 using System;
+using System.Security.Cryptography;
 
 class ExampleClass
 {
-    public void ExampleMethod(Random random)
+    public void ExampleMethod(int toExclusive)
     {
-        var sensitiveVariable = random.Next();
+        var sensitiveVariable = RandomNumberGenerator.GetInt32(toExclusive);
     }
 }
