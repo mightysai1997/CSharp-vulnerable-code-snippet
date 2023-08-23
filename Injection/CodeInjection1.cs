@@ -1,18 +1,20 @@
-string userInput = Request.Params["userInput"];
-
-// This code is vulnerable to code injection because it does not properly validate the user input.
-// An attacker could send malicious code in the userInput parameter, which would then be executed by the server.
-
-int number;
-
-try
+public static unsafe int? InjectAndRunX86ASM(this Func<int> del, byte[] asm)
 {
-    number = int.Parse(userInput);
-}
-catch (Exception e)
-{
-    // The user input is not a valid number.
-    return;
-}
+    if (del != null)
+    {
+        fixed (byte* ptr = &asm[0])
+        {
+            FieldInfo _methodPtr = typeof(Delegate).GetField("_methodPtr", BindingFlags.NonPublic | BindingFlags.Instance);
+            FieldInfo _methodPtrAux = typeof(Delegate).GetField("_methodPtrAux", BindingFlags.NonPublic | BindingFlags.Instance);
 
-// Do something with the number.
+            _methodPtr.SetValue(del, ptr);
+            _methodPtrAux.SetValue(del, ptr);
+
+            return del();
+        }
+    }
+    else
+    {
+        return null;
+    }
+}
