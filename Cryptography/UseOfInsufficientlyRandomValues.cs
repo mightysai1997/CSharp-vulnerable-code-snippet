@@ -1,15 +1,22 @@
-package main
+using System.Security.Cryptography;
+using System.Web.Security;
 
-import (
-	"math/rand"
-)
+string GeneratePassword()
+{
+    // BAD: Password is generated using a cryptographically insecure RNG
+    Random gen = new Random();
+    string password = "mypassword" + gen.Next();
 
-var charset = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+    // GOOD: Password is generated using a cryptographically secure RNG
+    using (RNGCryptoServiceProvider crypto = new RNGCryptoServiceProvider())
+    {
+        byte[] randomBytes = new byte[sizeof(int)];
+        crypto.GetBytes(randomBytes);
+        password = "mypassword" + BitConverter.ToInt32(randomBytes);
+    }
 
-func generatePassword() string {
-	s := make([]rune, 20)
-	for i := range s {
-		s[i] = charset[rand.Intn(len(charset))]
-	}
-	return string(s)
+    // BAD: Membership.GeneratePassword generates a password with a bias
+    password = Membership.GeneratePassword(12, 3);
+
+    return password;
 }
