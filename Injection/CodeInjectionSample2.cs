@@ -1,43 +1,40 @@
-public static unsafe int? InjectAndRunX86ASM(this Func<int> del, byte[] asm)
+using Microsoft.CSharp;
+using System;
+using System.CodeDom.Compiler;
+using System.Reflection;
+using System.Web;
+
+public class CodeInjectionHandler : IHttpHandler
 {
-    if (del != null)
+    public void ProcessRequest(HttpContext ctx)
     {
-        fixed (byte* ptr = &asm[0])
-        {
-            FieldInfo _methodPtr = typeof(Delegate).GetField("_methodPtr", BindingFlags.NonPublic | BindingFlags.Instance);
-            FieldInfo _methodPtrAux = typeof(Delegate).GetField("_methodPtrAux", BindingFlags.NonPublic | BindingFlags.Instance);
+        // Code for calculating tax is provided as unvalidated user input
+        string taxFormula = ctx.Request.QueryString["tax_formula"];
+        // Used to create C#
+        StringBuilder sourceCode = new StringBuilder("");
+        sourceCode.Append("public class TaxCalc {\n");
+        sourceCode.Append("\tpublic int CalculateTax(int value){\n");
+        sourceCode.Append("\t\treturn " + taxFormula + "; \n");
+        sourceCode.Append("\t}\n");
+        sourceCode.Append("}\n");
 
-            _methodPtr.SetValue(del, ptr);
-            _methodPtrAux.SetValue(del, ptr);
+        // BAD: This compiles the sourceCode, containing unvalidated user input
+        CSharpCodeProvider c = new CSharpCodeProvider();
+        ICodeCompiler icc = c.CreateCompiler();
+        CompilerParameters cp = new CompilerParameters();
+        CompilerResults cr = icc.CompileAssemblyFromSource(cp, sourceCode.ToString());
 
-            return del();using System.CodeDom.Compiler;
+        // Compiled input is loaded, and an instance of the class is constructed
+        System.Reflection.Assembly a = cr.CompiledAssembly;
+        object taxCalc = a.CreateInstance("TaxCalc");
 
-public class ExampleController : Controller
-{
-    public void Run(string message)
-    {
-        const string code = @"
-            using System;
-            public class MyClass
-            {
-                public void MyMethod()
-                {
-                    Console.WriteLine(""" + message + @""");
-                }
-            }
-        ";
+        // Unsafe code is executed
+        Type taxCalcType = o.GetType();
+        MethodInfo mi = type.GetMethod("CalculateTax");
+        int value = int.Parse(ctx.Request.QueryString["value"]);
+        int s = (int)mi.Invoke(o, new object[] { value });
 
-        var provider = CodeDomProvider.CreateProvider("CSharp");
-        var compilerParameters = new CompilerParameters { ReferencedAssemblies = { "System.dll", "System.Runtime.dll" } };
-        var compilerResults = provider.CompileAssemblyFromSource(compilerParameters, code);
-        object myInstance = compilerResults.CompiledAssembly.CreateInstance("MyClass");
-        myInstance.GetType().GetMethod("MyMethod").Invoke(myInstance, new object[0]);
-    }
-}
-        }
-    }
-    else
-    {
-        return null;
+        // Result is returned to the user
+        ctx.Response.Write("Tax value is: " + s);
     }
 }
