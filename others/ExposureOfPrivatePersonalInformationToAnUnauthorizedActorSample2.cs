@@ -1,26 +1,14 @@
-using System;
-using System.IO;
+using System.Net.Sockets;
 
-class Program
+class TestSocket
 {
-    static void Main(string[] args)
+    public static void Run()
     {
-        string pass = GetPassword();
-        // ...
+        // Sensitive
+        Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
-        int id = 123;       // Example value
-        string type = "A";  // Example value
-        DateTime tstamp = DateTime.Now;  // Example timestamp
-
-        using (StreamWriter dbmsLog = File.AppendText("log.txt"))
-        {
-            dbmsLog.WriteLine(id + ":" + pass + ":" + type + ":" + tstamp);
-        }
-    }
-
-    static string GetPassword()
-    {
-        // Example: Retrieve the password from a secure source
-        return "securePassword123";
+        // TcpClient and UdpClient simply abstract the details of creating a Socket
+        TcpClient client = new TcpClient("example.com", 80); // Sensitive
+        UdpClient listener = new UdpClient(80); // Sensitive
     }
 }
