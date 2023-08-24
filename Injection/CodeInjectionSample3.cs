@@ -1,21 +1,26 @@
 using System;
+using System.CodeDom.Compiler;
+using System.Web.Mvc;
 
-namespace CodeInjectionExample
+public class ExampleController : Controller
 {
-    class Program
+    public void Run(string message)
     {
-        static void Main(string[] args)
-        {
-            Console.Write("Enter your name: ");
-            string name = Console.ReadLine();
+        const string code = @"
+            using System;
+            public class MyClass
+            {
+                public void MyMethod()
+                {
+                    Console.WriteLine(""" + message + @""");
+                }
+            }
+        ";
 
-            string command = "echo Hello, " + name;
-            ExecuteCommand(command);
-        }
-
-        static void ExecuteCommand(string cmd)
-        {
-            System.Diagnostics.Process.Start("cmd", "/c " + cmd);
-        }
+        var provider = CodeDomProvider.CreateProvider("CSharp");
+        var compilerParameters = new CompilerParameters { ReferencedAssemblies = { "System.dll", "System.Runtime.dll" } };
+        var compilerResults = provider.CompileAssemblyFromSource(compilerParameters, code);
+        object myInstance = compilerResults.CompiledAssembly.CreateInstance("MyClass");
+        myInstance.GetType().GetMethod("MyMethod").Invoke(myInstance, new object[0]);
     }
 }
