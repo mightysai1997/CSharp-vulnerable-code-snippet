@@ -1,26 +1,26 @@
 using System;
 using System.Security.Cryptography;
-using System.Text;
+using System.Web.Security;
 
-public class Example
+class PasswordGenerator
 {
-    public static string GenerateForgotPasswordToken(string username)
+    string GeneratePassword()
     {
-        var time = DateTime.Now;
-        var input = time.Hour + ":" + time.Minute + username;
+        // BAD: Password is generated using a cryptographically insecure RNG
+        Random gen = new Random();
+        string password = "mypassword" + gen.Next();
 
-        using (var sha256 = SHA256.Create())
+        // GOOD: Password is generated using a cryptographically secure RNG
+        using (RNGCryptoServiceProvider crypto = new RNGCryptoServiceProvider())
         {
-            byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(input));
-            string hashHex = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
-            return hashHex;
+            byte[] randomBytes = new byte[sizeof(int)];
+            crypto.GetBytes(randomBytes);
+            password = "mypassword" + BitConverter.ToInt32(randomBytes);
         }
-    }
 
-    public static void Main()
-    {
-        string username = "example_user";
-        string token = GenerateForgotPasswordToken(username);
-        Console.WriteLine("Generated Token: " + token);
+        // BAD: Membership.GeneratePassword generates a password with a bias
+        password = Membership.GeneratePassword(12, 3);
+
+        return password;
     }
 }
