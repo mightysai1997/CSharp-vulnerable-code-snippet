@@ -1,34 +1,48 @@
 using System.Data;
 using System.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
+using System.Web.UI.WebControls;
 
-public class ExampleClass
+class SqlInjection
 {
-    public void Foo(DbContext context, string query, string param)
+    TextBox categoryTextBox;
+    string connectionString;
+
+    public DataSet GetDataSetByCategory()
     {
-        string sensitiveQuery = string.Concat(query, param);
-        context.Database.ExecuteSqlCommand(sensitiveQuery); // Sensitive
-        context.Query<User>().FromSql(sensitiveQuery); // Sensitive
+        // BAD: the category might have SQL special characters in it
+        using (var connection = new SqlConnection(connectionString))
+        {
+            var query1 = "SELECT ITEM,PRICE FROM PRODUCT WHERE ITEM_CATEGORY='"
+              + categoryTextBox.Text + "' ORDER BY PRICE";
+            var adapter = new SqlDataAdapter(query1, connection);
+            var result = new DataSet();
+            adapter.Fill(result);
+            return result;
+        }
 
-        context.Database.ExecuteSqlCommand($"SELECT * FROM mytable WHERE mycol={value}", param); // Sensitive, the FormattableString is evaluated and converted to RawSqlString
-        string formattedQuery = $"SELECT * FROM mytable WHERE mycol={param}";
-        context.Database.ExecuteSqlCommand(formattedQuery); // Sensitive, the FormattableString has already been evaluated, it won't be converted to a parametrized query.
+        // GOOD: use parameters with stored procedures
+        using (var connection = new SqlConnection(connectionString))
+        {
+            var adapter = new SqlDataAdapter("ItemsStoredProcedure", connection);
+            adapter.SelectCommand.CommandType = CommandType.StoredProcedure;
+            var parameter = new SqlParameter("category", categoryTextBox.Text);
+            adapter.SelectCommand.Parameters.Add(parameter);
+            var result = new DataSet();
+            adapter.Fill(result);
+            return result;
+        }
+
+        // GOOD: use parameters with dynamic SQL
+        using (var connection = new SqlConnection(connectionString))
+        {
+            var query2 = "SELECT ITEM,PRICE FROM PRODUCT WHERE ITEM_CATEGORY="
+              + "@category ORDER BY PRICE";
+            var adapter = new SqlDataAdapter(query2, connection);
+            var parameter = new SqlParameter("category", categoryTextBox.Text);
+            adapter.SelectCommand.Parameters.Add(parameter);
+            var result = new DataSet();
+            adapter.Fill(result);
+            return result;
+        }
     }
-
-    public void Bar(SqlConnection connection, string param)
-    {
-        SqlCommand command;
-        string sensitiveQuery = string.Format("INSERT INTO Users (name) VALUES (\"{0}\")", param);
-        command = new SqlCommand(sensitiveQuery); // Sensitive
-
-        command.CommandText = sensitiveQuery; // Sensitive
-
-        SqlDataAdapter adapter;
-        adapter = new SqlDataAdapter(sensitiveQuery, connection); // Sensitive
-    }
-}
-
-public class User
-{
-    // Define User class properties here
 }
