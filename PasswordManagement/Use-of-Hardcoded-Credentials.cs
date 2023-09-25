@@ -1,41 +1,33 @@
 using System;
 
-public class User
+namespace UserAuthentication
 {
-    public string UserName { get; set; }
-    public int UserId { get; set; }
-
-    public User(string userName, int userId)
+    public class UserController
     {
-        UserName = userName;
-        UserId = userId;
+        public string AuthenticateUser(string username, string password)
+        {
+            // Simplified authentication logic
+            if (username == "admin" && password == "admin123")
+            {
+                return "Welcome, admin!";
+            }
+            else
+            {
+                return "Login failed";
+            }
+        }
     }
-}
-
-public class UserManager
-{
-    public User CreateUser(string userName, int userId)
+    
+    public class MainApp
     {
-        // You can add your logic here to create a user with the provided parameters
-        User newUser = new User(userName, userId);
+        public static void Main(string[] args)
+        {
+            UserController userController = new UserController();
+            string username = Console.ReadLine();
+            string password = Console.ReadLine();
 
-        // Example: You can save the user to a database or perform other operations
-
-        return newUser;
-    }
-}
-
-public class Program
-{
-    public static void Main()
-    {
-        UserManager userManager = new UserManager();
-        
-        string userName = "JohnDoe";
-        int userId = 12345;
-        
-        User newUser = userManager.CreateUser(userName, userId);
-        
-        Console.WriteLine($"User Created: UserName - {newUser.UserName}, UserID - {newUser.UserId}");
+            string authenticationResult = userController.AuthenticateUser(username, password);
+            Console.WriteLine(authenticationResult);
+        }
     }
 }
