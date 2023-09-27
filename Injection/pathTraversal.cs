@@ -1,46 +1,20 @@
 using System;
-using System.Data.SqlClient;
+using System.IO;
 using System.Web;
 
-class Program
+public class TaintedPathHandler : IHttpHandler
 {
-    static void Main()
+    public void ProcessRequest(HttpContext ctx)
     {
-        // Example: Accept user input
-        string userInput = "<script>alert('XSS Attack');</script>";
-        
-        // Sanitize and validate user input
-        string sanitizedInput = SanitizeInput(userInput);
+        String path = ctx.Request.QueryString["path"];
+        // BAD: This could read any file on the filesystem.
+        ctx.Response.Write(File.ReadAllText(path));
 
-        // Use the sanitized input in a SQL query (always use parameterized queries to prevent SQL injection)
-        using (SqlConnection connection = new SqlConnection("your_connection_string"))
-        {
-            connection.Open();
-            string sql = "SELECT * FROM Users WHERE Username = @Username";
-            using (SqlCommand command = new SqlCommand(sql, connection))
-            {
-                // Use parameterized query to prevent SQL injection
-                command.Parameters.AddWithValue("@Username", sanitizedInput);
-                SqlDataReader reader = command.ExecuteReader();
-                while (reader.Read())
-                {
-                    Console.WriteLine(reader["Username"]);
-                }
-            }
-        }
+        // BAD: This could still read any file on the filesystem.
+        ctx.Response.Write(File.ReadAllText("/home/user/" + path));
 
-        // Display sanitized input on a web page (HTML escaping)
-        HttpContext.Current.Response.Write(HttpUtility.HtmlEncode(sanitizedInput));
-    }
-
-    // Sanitize user input (example: remove HTML tags)
-    static string SanitizeInput(string input)
-    {
-        // Remove HTML tags using a regular expression
-        string sanitizedInput = System.Text.RegularExpressions.Regex.Replace(input, "<.*?>", String.Empty);
-
-        // You can add more sanitation steps as needed, depending on your application's requirements
-
-        return sanitizedInput;
+        // GOOD: MapPath ensures the path is safe to read from.
+        string safePath = ctx.Request.MapPath(path, ctx.Request.ApplicationPath, false);
+        ctx.Response.Write(File.ReadAllText(safePath));
     }
 }
