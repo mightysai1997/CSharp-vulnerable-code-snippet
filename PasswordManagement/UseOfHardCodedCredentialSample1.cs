@@ -1,26 +1,29 @@
-using Microsoft.AspNetCore.Identity;
-
-// Inside a method or controller action
-var userManager = new UserManager<ApplicationUser>(userStore);
-
-var user = new ApplicationUser
+public class DatabaseConnection
 {
-    UserName = "username", // Set the desired username
-    // You can also set other user properties here
-};
+    private string _username = "myusername";
+    private string _password = "mypassword";
+    private string _database = "mydatabase";
 
-var result = await userManager.CreateAsync(user, "password123"); // Provide the desired password
-
-if (result.Succeeded)
-{
-    // User creation was successful
-    // You can add additional code here
-}
-else
-{
-    // User creation failed; handle errors
-    foreach (var error in result.Errors)
+    public void Connect()
     {
-        // Log or handle each error
+        // Establish a database connection using hardcoded credentials
+        string connectionString = $"Server=localhost;Database={_database};User Id={_username};Password={_password};";
+
+        // Connect to the database
+        SqlConnection connection = new SqlConnection(connectionString);
+
+        try
+        {
+            connection.Open();
+            // Perform database operations
+        }
+        catch (Exception ex)
+        {
+            // Handle connection or database errors
+        }
+        finally
+        {
+            connection.Close();
+        }
     }
 }
