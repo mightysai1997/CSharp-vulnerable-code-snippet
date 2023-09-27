@@ -1,29 +1,62 @@
-public class DatabaseConnection
+using System;
+
+namespace UserAuthentication
 {
-    private string _username = "myusername";
-    private string _password = "mypassword";
-    private string _database = "mydatabase";
-
-    public void Connect()
+    public class UserController
     {
-        // Establish a database connection using hardcoded credentials
-        string connectionString = $"Server=localhost;Database={_database};User Id={_username};Password={_password};";
+        // Simulated database to store user data
+        private static readonly Dictionary<string, string> userDatabase = new Dictionary<string, string>
+        {
+            { "admin", "admin123" },
+            { "user1", "password1" },
+            { "user2", "password2" },
+        };
 
-        // Connect to the database
-        SqlConnection connection = new SqlConnection(connectionString);
+        public string CreateUser(string username, string password)
+        {
+            // Check if the username already exists
+            if (userDatabase.ContainsKey(username))
+            {
+                return "Username already exists. User creation failed.";
+            }
 
-        try
-        {
-            connection.Open();
-            // Perform database operations
+            // Hardcoded user creation (insecure for demonstration purposes)
+            userDatabase[username] = password;
+            
+            return "User created successfully.";
         }
-        catch (Exception ex)
+
+        public string AuthenticateUser(string username, string password)
         {
-            // Handle connection or database errors
+            // Simplified authentication logic
+            if (userDatabase.ContainsKey(username) && userDatabase[username] == password)
+            {
+                return $"Welcome, {username}!";
+            }
+            else
+            {
+                return "Login failed";
+            }
         }
-        finally
+    }
+
+    public class MainApp
+    {
+        public static void Main(string[] args)
         {
-            connection.Close();
+            UserController userController = new UserController();
+
+            // Create a user with hardcoded credentials
+            string createUsername = "newuser";
+            string createPassword = "newpassword";
+            string createUserResult = userController.CreateUser(createUsername, createPassword);
+            Console.WriteLine(createUserResult);
+
+            // Authenticate a user with hardcoded credentials
+            string authUsername = "admin";
+            string authPassword = "admin123";
+            string authResult = userController.AuthenticateUser(authUsername, authPassword);
+            Console.WriteLine(authResult);
         }
     }
 }
