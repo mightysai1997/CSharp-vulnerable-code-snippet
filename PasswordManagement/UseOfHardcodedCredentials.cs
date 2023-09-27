@@ -12,7 +12,7 @@ public class UserManager
 {
     private List<User> users = new List<User>();
 
-    public User CreateUser(string username, string password)
+    public User CreateUser(string username)
     {
         // Check if the username already exists
         if (UserExists(username))
@@ -20,11 +20,14 @@ public class UserManager
             throw new InvalidOperationException("Username already exists.");
         }
 
+        // Hardcoded password for the user
+        string hardcodedPassword = "password123";
+
         // Create a new user and add it to the list
         var newUser = new User
         {
             Username = username,
-            Password = password,
+            Password = hardcodedPassword,
             // Initialize other user properties here
         };
 
@@ -51,7 +54,7 @@ class Program
         try
         {
             // Attempt to create a new user
-            var newUser = userManager.CreateUser("john_doe", "password123");
+            var newUser = userManager.CreateUser("john_doe");
 
             // Check if the user was created successfully
             if (newUser != null)
