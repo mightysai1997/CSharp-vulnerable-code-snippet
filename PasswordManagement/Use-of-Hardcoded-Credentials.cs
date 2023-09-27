@@ -1,27 +1,20 @@
 using System;
 
-class User
+public class User
 {
+    public int Id { get; set; }
     public string Username { get; set; }
-    public string Email { get; set; }
+    public string Password { get; set; }
+    // Other user properties
 }
 
-class UserService
+public class UserRepository
 {
-    // Hypothetical CreateUser method that requires two input parameters
-    public User CreateUser(string username, string email)
+    // Simulated user repository
+    public void CreateUser(User user)
     {
-        // Create a new User object with the provided parameters
-        User newUser = new User
-        {
-            Username = username,
-            Email = email
-        };
-
-        // Perform any additional logic or operations here (e.g., database insertion)
-
-        // Return the created user
-        return newUser;
+        // Simulate user creation logic (e.g., save to a database)
+        Console.WriteLine($"User created with Username: {user.Username}");
     }
 }
 
@@ -29,17 +22,17 @@ class Program
 {
     static void Main()
     {
-        // Sample input data
-        string username = "john_doe";
-        string email = "john.doe@example.com";
+        // Hard-coded user credentials
+        var newUser = new User
+        {
+            Username = "john_doe",
+            Password = "password123",
+            // Set other user properties here
+        };
 
-        // Create an instance of the UserService
-        UserService userService = new UserService();
+        var userRepository = new UserRepository();
+        userRepository.CreateUser(newUser);
 
-        // Call the CreateUser method with two parameters
-        User createdUser = userService.CreateUser(username, email);
-
-        // Print the created user's information
-        Console.WriteLine($"Created User: Username = {createdUser.Username}, Email = {createdUser.Email}");
+        // Rest of your code...
     }
 }
