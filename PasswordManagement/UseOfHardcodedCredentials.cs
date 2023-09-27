@@ -1,25 +1,33 @@
 using System;
 
-class Program
+namespace UserAuthentication
 {
-    static void Main()
+    public class UserController
     {
-        // Sample input data
-        string username = "john_doe";
-        string email = "john.doe@example.com";
-
-        // Call the CreateUser function with two parameters
-        CreateUser(username, email);
-
-        // Rest of your code...
+        public string CreateUser(string username, string password)
+        {
+            // Simulated user creation logic
+            if (username == "admin" && password == "admin123")
+            {
+                return "User created successfully!";
+            }
+            else
+            {
+                return "User creation failed";
+            }
+        }
     }
 
-    // Define the CreateUser function with two parameters
-    static void CreateUser(string username, string email)
+    public class MainApp
     {
-        // Your logic for creating a user goes here
-        Console.WriteLine($"Creating user with username: {username} and email: {email}");
-        
-        // For example, you can make an API call or perform database operations here
+        public static void Main(string[] args)
+        {
+            UserController userController = new UserController();
+            string username = Console.ReadLine();
+            string password = Console.ReadLine();
+
+            string creationResult = userController.CreateUser(username, password);
+            Console.WriteLine(creationResult);
+        }
     }
 }
