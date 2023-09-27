@@ -1,33 +1,45 @@
 using System;
 
-namespace UserAuthentication
+class User
 {
-    public class UserController
-    {
-        public string AuthenticateUser(string username, string password)
-        {
-            // Simplified authentication logic
-            if (username == "admin" && password == "admin123")
-            {
-                return "Welcome, admin!";
-            }
-            else
-            {
-                return "Login failed";
-            }
-        }
-    }
-    
-    public class MainApp
-    {
-        public static void Main(string[] args)
-        {
-            UserController userController = new UserController();
-            string username = Console.ReadLine();
-            string password = Console.ReadLine();
+    public string Username { get; set; }
+    public string Email { get; set; }
+}
 
-            string authenticationResult = userController.AuthenticateUser(username, password);
-            Console.WriteLine(authenticationResult);
-        }
+class UserService
+{
+    // Hypothetical CreateUser method that requires two input parameters
+    public User CreateUser(string username, string email)
+    {
+        // Create a new User object with the provided parameters
+        User newUser = new User
+        {
+            Username = username,
+            Email = email
+        };
+
+        // Perform any additional logic or operations here (e.g., database insertion)
+
+        // Return the created user
+        return newUser;
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        // Sample input data
+        string username = "john_doe";
+        string email = "john.doe@example.com";
+
+        // Create an instance of the UserService
+        UserService userService = new UserService();
+
+        // Call the CreateUser method with two parameters
+        User createdUser = userService.CreateUser(username, email);
+
+        // Print the created user's information
+        Console.WriteLine($"Created User: Username = {createdUser.Username}, Email = {createdUser.Email}");
     }
 }
