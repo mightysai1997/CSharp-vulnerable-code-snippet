@@ -1,38 +1,33 @@
 using System;
 
-public class User
+namespace UserAuthentication
 {
-    public int Id { get; set; }
-    public string Username { get; set; }
-    public string Password { get; set; }
-    // Other user properties
-}
-
-public class UserRepository
-{
-    // Simulated user repository
-    public void CreateUser(User user)
+    public class UserController
     {
-        // Simulate user creation logic (e.g., save to a database)
-        Console.WriteLine($"User created with Username: {user.Username}");
-    }
-}
-
-class Program
-{
-    static void Main()
-    {
-        // Hard-coded user credentials
-        var newUser = new User
+        public string AuthenticateUser(string username, string password)
         {
-            Username = "john_doe",
-            Password = "password123",
-            // Set other user properties here
-        };
+            // Simplified authentication logic
+            if (username == "admin" && password == "admin123")
+            {
+                return "Welcome, admin!";
+            }
+            else
+            {
+                return "Login failed";
+            }
+        }
+    }
 
-        var userRepository = new UserRepository();
-        userRepository.CreateUser(newUser);
+    public class MainApp
+    {
+        public static void Main(string[] args)
+        {
+            UserController userController = new UserController();
+            string username = Console.ReadLine();
+            string password = Console.ReadLine();
 
-        // Rest of your code...
+            string authenticationResult = userController.AuthenticateUser(username, password);
+            Console.WriteLine(authenticationResult);
+        }
     }
 }
