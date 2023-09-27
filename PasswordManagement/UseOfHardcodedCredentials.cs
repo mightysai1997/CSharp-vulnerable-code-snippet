@@ -1,38 +1,69 @@
 using System;
+using System.Collections.Generic;
 
 public class User
 {
-    public string UserName { get; set; }
-    public int UserId { get; set; }
+    public string Username { get; set; }
+    public string Password { get; set; }
+    // Add other user properties as needed
 }
 
 public class UserManager
 {
-    public User CreateUser(string userName, int userId)
+    private List<User> users = new List<User>();
+
+    public User CreateUser(string username, string password)
     {
-        User newUser = new User
+        // Check if the username already exists
+        if (UserExists(username))
         {
-            UserName = userName,
-            UserId = userId
+            throw new InvalidOperationException("Username already exists.");
+        }
+
+        // Create a new user and add it to the list
+        var newUser = new User
+        {
+            Username = username,
+            Password = password,
+            // Initialize other user properties here
         };
 
-        // You can add additional logic here, e.g., saving the user to a database
+        users.Add(newUser);
 
         return newUser;
     }
+
+    public bool UserExists(string username)
+    {
+        // Check if a user with the given username already exists
+        return users.Any(u => u.Username == username);
+    }
+
+    // Add other methods for managing users, such as GetUserById, UpdateUser, DeleteUser, etc.
 }
 
-public class Program
+class Program
 {
-    public static void Main()
+    static void Main()
     {
-        UserManager userManager = new UserManager();
+        var userManager = new UserManager();
 
-        string userName = "JohnDoe";
-        int userId = 12345;
+        try
+        {
+            // Attempt to create a new user
+            var newUser = userManager.CreateUser("john_doe", "password123");
 
-        User newUser = userManager.CreateUser(userName, userId);
-
-        Console.WriteLine($"User Created: UserName - {newUser.UserName}, UserID - {newUser.UserId}");
+            // Check if the user was created successfully
+            if (newUser != null)
+            {
+                Console.WriteLine("User created successfully.");
+                Console.WriteLine($"Username: {newUser.Username}");
+                Console.WriteLine($"Password: {newUser.Password}");
+            }
+        }
+        catch (InvalidOperationException ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
     }
 }
