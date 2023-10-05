@@ -7,6 +7,13 @@ public class UserRegistration
     {
         try
         {
+            // Validate input username and password (ensure they are not null or empty)
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            {
+                Console.WriteLine("Invalid username or password.");
+                return false;
+            }
+
             // Attempt to create the user using Membership.CreateUser method
             MembershipUser newUser = Membership.CreateUser(username, password);
 
