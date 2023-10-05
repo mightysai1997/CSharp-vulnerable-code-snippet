@@ -3,14 +3,15 @@ using System.Web.Security;
 
 public class UserRegistration
 {
+    // Declare class-level variables for username and password
+    private static string username = "exampleUser"; 
+    private static string password = "examplePassword";
+
     public static void Main(string[] args)
     {
-        string username = "exampleUser"; // Replace with the desired username
-        string password = "examplePassword"; // Replace with the desired password
-
         try
         {
-            // Attempt to create the user using Membership.CreateUser method
+            // Attempt to create the user using CreateUser method
             MembershipUser newUser = CreateUser(username, password);
 
             if (newUser != null)
