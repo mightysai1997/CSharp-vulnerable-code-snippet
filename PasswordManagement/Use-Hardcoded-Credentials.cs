@@ -1,12 +1,17 @@
 using System;
+using System.Configuration;
 using System.Web.Security;
 
 public class UserRegistration
 {
-    public bool RegisterUser(string username, string password)
+    public bool RegisterUser()
     {
         try
         {
+            // Retrieve credentials from configuration file
+            string username = ConfigurationManager.AppSettings["MembershipUsername"];
+            string password = ConfigurationManager.AppSettings["MembershipPassword"];
+
             // Validate input username and password (ensure they are not null or empty)
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
