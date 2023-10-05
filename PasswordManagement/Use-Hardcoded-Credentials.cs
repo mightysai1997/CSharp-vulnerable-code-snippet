@@ -7,18 +7,8 @@ public class UserRegistration
     {
         try
         {
-            // Check if the username already exists
-            if (!Membership.GetUser(username) == null)
-            {
-                // User already exists
-                return false;
-            }
-
-            // Generate a unique user ID (optional, based on your requirements)
-            Guid userId = Guid.NewGuid();
-
-            // Create a MembershipUser instance with the provided username and user ID
-            MembershipUser newUser = Membership.CreateUser(username, password, null);
+            // Attempt to create the user using Membership.CreateUser method
+            MembershipUser newUser = Membership.CreateUser(username, password);
 
             if (newUser != null)
             {
@@ -31,9 +21,15 @@ public class UserRegistration
                 return false;
             }
         }
+        catch (MembershipCreateUserException ex)
+        {
+            // Handle specific exceptions if needed
+            Console.WriteLine("User registration failed. Error: " + ex.Message);
+            return false;
+        }
         catch (Exception ex)
         {
-            // Handle exceptions (e.g., database connection issues, etc.)
+            // Handle other exceptions (e.g., database connection issues, etc.)
             Console.WriteLine("Error: " + ex.Message);
             return false;
         }
