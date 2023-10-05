@@ -1,33 +1,56 @@
 using System;
+using System.Web.Security;
 
-namespace UserAuthentication
+public class UserRegistration
 {
-    public class UserController
+    // Declare class-level variables for username and password
+    private static string defaultUsername = "exampleUser"; 
+    private static string defaultPassword = "examplePassword";
+
+    public static void Main(string[] args)
     {
-        public string CreateUser(string username, string password)
+        try
         {
-            // Simulated user creation logic
-            if (username == "admin" && password == "admin123")
+            // Attempt to create the user using CreateUser method
+            MembershipUser newUser = CreateUser(defaultUsername, defaultPassword);
+
+            if (newUser != null)
             {
-                return "User created successfully!";
+                Console.WriteLine("User registration successful!");
             }
             else
             {
-                return "User creation failed";
+                Console.WriteLine("User registration failed.");
             }
+        }
+        catch (MembershipCreateUserException ex)
+        {
+            // Handle specific exceptions if needed
+            Console.WriteLine("User registration failed. Error: " + ex.Message);
+        }
+        catch (Exception ex)
+        {
+            // Handle other exceptions (e.g., database connection issues, etc.)
+            Console.WriteLine("Error: " + ex.Message);
         }
     }
 
-    public class MainApp
+    public static MembershipUser CreateUser(string inputUsername, string inputPassword)
     {
-        public static void Main(string[] args)
+        try
         {
-            UserController userController = new UserController();
-            string username = Console.ReadLine();
-            string password = Console.ReadLine();
-
-            string creationResult = userController.CreateUser(username, password);
-            Console.WriteLine(creationResult);
+            // Attempt to create the user using Membership.CreateUser method
+            return Membership.CreateUser(inputUsername, inputPassword);
+        }
+        catch (MembershipCreateUserException)
+        {
+            // Handle specific exceptions if needed
+            throw;
+        }
+        catch (Exception)
+        {
+            // Handle other exceptions (e.g., database connection issues, etc.)
+            throw;
         }
     }
 }
