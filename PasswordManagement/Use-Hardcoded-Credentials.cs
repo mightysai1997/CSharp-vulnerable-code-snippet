@@ -1,11 +1,11 @@
 using System;
 using System.Web.Security;
-
+private static string username = "exampleUser"; 
+private static string password = "examplePassword";
 public class UserRegistration
 {
     // Declare class-level variables for username and password
-    private static string username = "exampleUser"; 
-    private static string password = "examplePassword";
+   
 
     public static void Main(string[] args)
     {
