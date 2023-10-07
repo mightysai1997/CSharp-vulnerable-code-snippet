@@ -1,52 +1,28 @@
 using System;
 using System.IO;
 using System.Net;
-using System.Text;
 
 public class DataTransmitter
 {
     public static void Main(string[] args)
     {
-        try
+        string sensitiveData = "ThisIsSensitiveData123";
+
+        // Insecure: Sending sensitive data over HTTP (cleartext)
+        HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://example.com/submit");
+        request.Method = "POST";
+        request.ContentType = "text/plain";
+
+        using (StreamWriter writer = new StreamWriter(request.GetRequestStream()))
         {
-            // Source data to be transmitted
-            string sourceData = "This is the data to be transmitted.";
-
-            // Destination URL where the data will be sent
-            string destinationUrl = "https://example.com/api/receive";
-
-            // Create a request object with the destination URL
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(destinationUrl);
-
-            // Set the request method to POST
-            request.Method = "POST";
-
-            // Set the content type and content length headers
-            request.ContentType = "application/x-www-form-urlencoded";
-            byte[] byteArray = Encoding.UTF8.GetBytes("data=" + sourceData);
-            request.ContentLength = byteArray.Length;
-
-            // Get the request stream and write the data to be transmitted
-            using (Stream dataStream = request.GetRequestStream())
-            {
-                dataStream.Write(byteArray, 0, byteArray.Length);
-            }
-
-            // Get the response from the server
-            using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-            {
-                // Read the response data
-                using (Stream dataStream = response.GetResponseStream())
-                {
-                    StreamReader reader = new StreamReader(dataStream);
-                    string responseFromServer = reader.ReadToEnd();
-                    Console.WriteLine("Response from server: " + responseFromServer);
-                }
-            }
+            writer.Write(sensitiveData);
         }
-        catch (Exception ex)
+
+        HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+        using (StreamReader reader = new StreamReader(response.GetResponseStream()))
         {
-            Console.WriteLine("Error: " + ex.Message);
+            string result = reader.ReadToEnd();
+            Console.WriteLine("Server Response: " + result);
         }
     }
 }
