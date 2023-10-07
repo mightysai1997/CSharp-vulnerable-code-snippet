@@ -1,40 +1,20 @@
 using System;
-using System.Security;
-using System.Security.Cryptography;
-using System.Web.Security;
 
-class PasswordGenerator
+class RandomKeyGenerator
 {
-    public static void Main(string[] args)
+    static void Main(string[] args)
     {
-        string generatedPassword = GeneratePassword();
-
-        // Store or use the generated password securely here
-        Console.WriteLine("Generated Password: " + generatedPassword);
+        string insecureKey = GenerateInsecureKey();
+        
+        // Using the insecure key for encryption or other security operations
+        Console.WriteLine("Insecure Key: " + insecureKey);
     }
 
-    static string GeneratePassword()
+    static string GenerateInsecureKey()
     {
-        string password;
-        using (RNGCryptoServiceProvider crypto = new RNGCryptoServiceProvider())
-        {
-            byte[] randomBytes = new byte[sizeof(int)];
-            crypto.GetBytes(randomBytes);
-            password = "mypassword" + BitConverter.ToInt32(randomBytes);
-        }
-
-        return password;
-    }
-
-    // Securely convert a string to a SecureString
-    static SecureString ToSecureString(string input)
-    {
-        SecureString secureString = new SecureString();
-        foreach (char c in input)
-        {
-            secureString.AppendChar(c);
-        }
-        secureString.MakeReadOnly();
-        return secureString;
+        Random random = new Random();
+        int randomNumber = random.Next(100000, 999999); // Generate a random 6-digit number
+        string insecureKey = "KEY_" + randomNumber.ToString();
+        return insecureKey;
     }
 }
