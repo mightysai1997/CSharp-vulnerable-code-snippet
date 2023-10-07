@@ -1,42 +1,27 @@
 using System;
+using System.Text;
+using System.Web;
 
-public class UserProfile
+public class PrivateInformationHandler : IHttpHandler
 {
-    private string username;
-    private string password;
+    private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-    public UserProfile(string username, string password)
+    public void ProcessRequest(HttpContext ctx)
     {
-        this.username = username;
-        this.password = password;
+        string address = ctx.Request.QueryString["Address1"];
+
+        // Log the private information (address) - Ensure proper security measures are in place
+        logger.Info("User has address: " + address);
+
+        // Perform other processing based on the address if needed
+
+        // Send response to the client
+        ctx.Response.ContentType = "text/plain";
+        ctx.Response.Write("Address information received and logged successfully.");
     }
 
-    public void DisplayUserProfile()
+    public bool IsReusable
     {
-        Console.WriteLine("Username: " + username);
-        Console.WriteLine("Password: " + password);
-    }
-}
-
-public class UnauthorizedAccess
-{
-    public static void Main(string[] args)
-    {
-        // Simulating a scenario where a user's profile is accessed without proper authorization.
-        string unauthorizedUsername = "hacker";
-        string unauthorizedPassword = "password123";
-
-        // Assume userProfile is an instance of the UserProfile class, holding private user information.
-        UserProfile userProfile = new UserProfile("legitimateUser", "securePassword");
-
-        // Unauthorized actor accesses and displays the user's profile.
-        if (unauthorizedUsername.Equals(userProfile.Username, StringComparison.OrdinalIgnoreCase) && unauthorizedPassword.Equals(userProfile.Password))
-        {
-            userProfile.DisplayUserProfile(); // Vulnerability: Unauthorized access to sensitive information
-        }
-        else
-        {
-            Console.WriteLine("Unauthorized access: Invalid credentials.");
-        }
+        get { return false; }
     }
 }
