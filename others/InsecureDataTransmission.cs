@@ -1,32 +1,52 @@
 using System;
-using System.Net.Http;
-using System.Threading.Tasks;
+using System.IO;
+using System.Net;
+using System.Text;
 
-public class DataTransmissionExample
+public class DataTransmitter
 {
-    public static async Task Main(string[] args)
+    public static void Main(string[] args)
     {
-        // URL of the API endpoint
-        string apiUrl = "https://api.example.com/data";
-
-        // Data to be transmitted
-        string sensitiveData = "This is sensitive data that needs to be transmitted securely.";
-
-        // Creating HttpClient with SSL/TLS enabled
-        using (HttpClient httpClient = new HttpClient())
+        try
         {
-            // Sending data securely using HTTPS
-            HttpResponseMessage response = await httpClient.PostAsync(apiUrl, new StringContent(sensitiveData));
+            // Source data to be transmitted
+            string sourceData = "This is the data to be transmitted.";
 
-            // Handling the response
-            if (response.IsSuccessStatusCode)
+            // Destination URL where the data will be sent
+            string destinationUrl = "https://example.com/api/receive";
+
+            // Create a request object with the destination URL
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(destinationUrl);
+
+            // Set the request method to POST
+            request.Method = "POST";
+
+            // Set the content type and content length headers
+            request.ContentType = "application/x-www-form-urlencoded";
+            byte[] byteArray = Encoding.UTF8.GetBytes("data=" + sourceData);
+            request.ContentLength = byteArray.Length;
+
+            // Get the request stream and write the data to be transmitted
+            using (Stream dataStream = request.GetRequestStream())
             {
-                Console.WriteLine("Data transmitted securely!");
+                dataStream.Write(byteArray, 0, byteArray.Length);
             }
-            else
+
+            // Get the response from the server
+            using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
             {
-                Console.WriteLine("Failed to transmit data securely. Status code: " + response.StatusCode);
+                // Read the response data
+                using (Stream dataStream = response.GetResponseStream())
+                {
+                    StreamReader reader = new StreamReader(dataStream);
+                    string responseFromServer = reader.ReadToEnd();
+                    Console.WriteLine("Response from server: " + responseFromServer);
+                }
             }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error: " + ex.Message);
         }
     }
 }
