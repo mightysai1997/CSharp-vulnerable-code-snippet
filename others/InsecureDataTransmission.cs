@@ -1,33 +1,27 @@
 using System;
 using System.Net.Http;
+using System.Threading.Tasks;
 
-public class SecureDataTransmission
+public class DataTransmissionExample
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
-        // Replace these values with your actual API endpoint and sensitive data
-        string apiUrl = "https://example.com/api/data";
-        string sensitiveData = "This is my sensitive data.";
+        // URL of the API endpoint
+        string apiUrl = "https://api.example.com/data";
 
-        // Create a HttpClient instance to make the secure request
-        using (HttpClient client = new HttpClient())
+        // Data to be transmitted
+        string sensitiveData = "This is sensitive data that needs to be transmitted securely.";
+
+        // Creating HttpClient with SSL/TLS enabled
+        using (HttpClient httpClient = new HttpClient())
         {
-            // Use TLS for secure communication
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+            // Sending data securely using HTTPS
+            HttpResponseMessage response = await httpClient.PostAsync(apiUrl, new StringContent(sensitiveData));
 
-            // Convert sensitive data to bytes
-            byte[] dataBytes = System.Text.Encoding.UTF8.GetBytes(sensitiveData);
-
-            // Use ByteArrayContent to send data in the request body
-            ByteArrayContent content = new ByteArrayContent(dataBytes);
-
-            // Send a POST request to the API endpoint
-            HttpResponseMessage response = client.PostAsync(apiUrl, content).Result;
-
-            // Check the response status
+            // Handling the response
             if (response.IsSuccessStatusCode)
             {
-                Console.WriteLine("Data transmitted securely.");
+                Console.WriteLine("Data transmitted securely!");
             }
             else
             {
