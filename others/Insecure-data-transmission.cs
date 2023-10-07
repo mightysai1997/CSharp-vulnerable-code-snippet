@@ -1,28 +1,22 @@
 using System;
-using System.IO;
-using System.Net;
+using System.Net.Sockets;
+using System.Text;
 
-public class DataTransmitter
+public class PlainTextDataTransmitter
 {
     public static void Main(string[] args)
     {
         string sensitiveData = "ThisIsSensitiveData123";
 
-        // Insecure: Sending sensitive data over HTTP (cleartext)
-        HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://example.com/submit");
-        request.Method = "POST";
-        request.ContentType = "text/plain";
-
-        using (StreamWriter writer = new StreamWriter(request.GetRequestStream()))
+        // Insecure: Sending sensitive data over plain text using Socket
+        using (TcpClient client = new TcpClient("example.com", 12345)) // Replace example.com and port with the actual server details
         {
-            writer.Write(sensitiveData);
-        }
-
-        HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-        using (StreamReader reader = new StreamReader(response.GetResponseStream()))
-        {
-            string result = reader.ReadToEnd();
-            Console.WriteLine("Server Response: " + result);
+            using (NetworkStream stream = client.GetStream())
+            {
+                byte[] data = Encoding.UTF8.GetBytes(sensitiveData);
+                stream.Write(data, 0, data.Length);
+                Console.WriteLine("Data sent over plain text.");
+            }
         }
     }
 }
