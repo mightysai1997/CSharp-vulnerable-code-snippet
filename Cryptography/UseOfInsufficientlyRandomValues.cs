@@ -1,16 +1,21 @@
 using System;
+using System.Security;
 using System.Security.Cryptography;
 using System.Web.Security;
 
 class PasswordGenerator
 {
-    string GeneratePassword()
+    public static void Main(string[] args)
     {
-        // BAD: Password is generated using a cryptographically insecure RNG
-        Random gen = new Random();
-        string password = "mypassword" + gen.Next();
+        string generatedPassword = GeneratePassword();
 
-        // GOOD: Password is generated using a cryptographically secure RNG
+        // Store or use the generated password securely here
+        Console.WriteLine("Generated Password: " + generatedPassword);
+    }
+
+    static string GeneratePassword()
+    {
+        string password;
         using (RNGCryptoServiceProvider crypto = new RNGCryptoServiceProvider())
         {
             byte[] randomBytes = new byte[sizeof(int)];
@@ -18,9 +23,18 @@ class PasswordGenerator
             password = "mypassword" + BitConverter.ToInt32(randomBytes);
         }
 
-        // BAD: Membership.GeneratePassword generates a password with a bias
-        password = Membership.GeneratePassword(12, 3);
-
         return password;
+    }
+
+    // Securely convert a string to a SecureString
+    static SecureString ToSecureString(string input)
+    {
+        SecureString secureString = new SecureString();
+        foreach (char c in input)
+        {
+            secureString.AppendChar(c);
+        }
+        secureString.MakeReadOnly();
+        return secureString;
     }
 }
