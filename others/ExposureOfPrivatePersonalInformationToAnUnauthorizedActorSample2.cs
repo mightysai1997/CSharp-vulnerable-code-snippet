@@ -1,56 +1,44 @@
 using System;
+using System.Net;
 using System.IO;
 
-public class PasswordLogger
-{
-    private StreamWriter dbmsLog;
-
-    public PasswordLogger(string logFilePath)
-    {
-        dbmsLog = new StreamWriter(logFilePath, true);
-    }
-
-    public void LogPassword(int id, string type, DateTime timestamp)
-    {
-        string pass = GetPassword(); // Call your GetPassword() function to retrieve the password
-
-        // Log the information to the database log
-        dbmsLog.WriteLine(id + ":" + pass + ":" + type + ":" + timestamp);
-        dbmsLog.Flush(); // Ensure the log is written immediately
-
-        // Other processing using the retrieved password, if needed
-    }
-
-    private string GetPassword()
-    {
-        // Implement your logic to retrieve the password here
-        // For example, you might query a database or read from a secure source
-        // For demonstration purposes, returning a hardcoded password
-        return "SamplePassword123";
-    }
-
-    public void CloseLog()
-    {
-        // Close the log file when done logging
-        dbmsLog.Close();
-    }
-}
-
-class Program
+class DataTransmitter
 {
     static void Main(string[] args)
     {
-        string logFilePath = "log.txt"; // Specify the path to your log file
-        PasswordLogger passwordLogger = new PasswordLogger(logFilePath);
+        // Sensitive data to be transmitted
+        string sensitiveData = "This is sensitive information.";
 
-        int userId = 1; // Example user ID
-        string userType = "admin"; // Example user type
-        DateTime timestamp = DateTime.Now; // Example timestamp
+        // Destination URL where the data will be sent (without HTTPS)
+        string destinationUrl = "http://example.com/api/receive";
 
-        // Log password and other information
-        passwordLogger.LogPassword(userId, userType, timestamp);
+        // Create a request object with the destination URL
+        HttpWebRequest request = (HttpWebRequest)WebRequest.Create(destinationUrl);
 
-        // Close the log file
-        passwordLogger.CloseLog();
+        // Set the request method to POST
+        request.Method = "POST";
+        
+        // Encode the data to be transmitted
+        byte[] data = System.Text.Encoding.UTF8.GetBytes("data=" + sensitiveData);
+
+        // Set the content type and content length headers
+        request.ContentType = "application/x-www-form-urlencoded";
+        request.ContentLength = data.Length;
+
+        // Get the request stream and write the data to be transmitted
+        using (Stream stream = request.GetRequestStream())
+        {
+            stream.Write(data, 0, data.Length);
+        }
+
+        // Get the response from the server
+        HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+
+        // Read the response data
+        using (StreamReader reader = new StreamReader(response.GetResponseStream()))
+        {
+            string responseFromServer = reader.ReadToEnd();
+            Console.WriteLine("Response from server: " + responseFromServer);
+        }
     }
 }
