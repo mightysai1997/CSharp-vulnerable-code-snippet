@@ -1,22 +1,55 @@
 using System;
-using System.Net.Sockets;
-using System.Text;
+using System.IO;
+using System.Net;
 
-public class PlainTextDataTransmitter
+class Program
 {
-    public static void Main(string[] args)
+    static void Main()
     {
-        string sensitiveData = "ThisIsSensitiveData123";
+        // Sensitive data to be transmitted
+        string sensitiveData = "This is my sensitive data.";
 
-        // Insecure: Sending sensitive data over plain text using Socket
-        using (TcpClient client = new TcpClient("example.com", 12345)) // Replace example.com and port with the actual server details
+        // Destination URL (insecure HTTP)
+        string destinationUrl = "http://example.com/receiver";
+
+        try
         {
-            using (NetworkStream stream = client.GetStream())
-            {
-                byte[] data = Encoding.UTF8.GetBytes(sensitiveData);
-                stream.Write(data, 0, data.Length);
-                Console.WriteLine("Data sent over plain text.");
-            }
+            // Convert the data to bytes
+            byte[] dataBytes = System.Text.Encoding.UTF8.GetBytes(sensitiveData);
+
+            // Create a request object
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(destinationUrl);
+
+            // Set the request method to POST
+            request.Method = "POST";
+
+            // Set the content type and content length
+            request.ContentType = "application/x-www-form-urlencoded";
+            request.ContentLength = dataBytes.Length;
+
+            // Get the request stream and write the data to it
+            Stream requestStream = request.GetRequestStream();
+            requestStream.Write(dataBytes, 0, dataBytes.Length);
+            requestStream.Close();
+
+            // Get the response from the server
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+
+            // Read the response (if needed)
+            StreamReader reader = new StreamReader(response.GetResponseStream());
+            string responseText = reader.ReadToEnd();
+
+            // Do something with the response (if needed)
+            Console.WriteLine("Response from server: " + responseText);
+
+            // Close the response and request streams
+            response.Close();
+            reader.Close();
+        }
+        catch (Exception ex)
+        {
+            // Handle exceptions
+            Console.WriteLine("Error: " + ex.Message);
         }
     }
 }
