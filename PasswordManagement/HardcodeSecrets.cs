@@ -14,6 +14,7 @@ namespace dvcsharp_core_api.Models
       public const string RoleUser = "User";
       public const string RoleSupport = "Support";
       public const string RoleAdministrator = "Administrator";
+      public const int Number = 999999999;
       
 
       public int ID { get; set; }
