@@ -1,6 +1,7 @@
 using System;
+using System.Collections.Generic;
 
-class UserData
+public class UserData
 {
     public string Username { get; set; }
     public string Password { get; set; }
@@ -8,34 +9,38 @@ class UserData
     // Other sensitive personal information fields...
 }
 
-class Program
+public class InsecureDatabase
 {
-    static void Main()
+    // Simulating an insecure storage mechanism for user data
+    private static List<UserData> userDataStorage = new List<UserData>();
+
+    public static void SaveUserData(UserData user)
     {
-        // Simulating a scenario where user data is accessed without proper authorization
-        string unauthorizedUsername = "attacker";
-
-        // Fetching user data without proper authorization
-        UserData unauthorizedUserData = GetUserInformation(unauthorizedUsername);
-
-        // Displaying unauthorized user data (for educational purposes only)
-        Console.WriteLine($"Unauthorized Access: Username - {unauthorizedUserData.Username}, Email - {unauthorizedUserData.Email}");
+        // Insecurely storing user data without encryption or proper security measures
+        userDataStorage.Add(user);
     }
 
-    static UserData GetUserInformation(string username)
+    public static List<UserData> GetAllUserData()
     {
-        // In a secure system, proper authentication and authorization checks should be performed here.
-        // This is a simplified example for educational purposes only.
+        // In a secure system, this method should have proper access controls.
+        // This is a simulated insecure scenario for educational purposes only.
+        return userDataStorage;
+    }
+}
 
-        // Simulating fetching user data from a database based on the provided username
-        UserData user = new UserData
+public class Program
+{
+    public static void Main()
+    {
+        // Simulating a scenario where an unauthorized actor retrieves all user data
+        List<UserData> allUsersData = InsecureDatabase.GetAllUserData();
+
+        // Displaying all user data (for educational purposes only)
+        Console.WriteLine("Unauthorized Access: All User Data");
+        foreach (var user in allUsersData)
         {
-            Username = "legitimateUser",
-            Password = "securePassword123",
-            Email = "user@example.com"
-            // Other sensitive personal information...
-        };
-
-        return user;
+            Console.WriteLine($"Username - {user.Username}, Email - {user.Email}");
+            // Displaying other sensitive personal information...
+        }
     }
 }
