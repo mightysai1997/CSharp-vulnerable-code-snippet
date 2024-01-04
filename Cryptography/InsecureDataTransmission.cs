@@ -1,6 +1,8 @@
 /*
-
-
+Vulnerability Type : Cleartext Transmission of Sensitive Information
+CWE : CWE-319
+Description : The PostAsync method is vulnerable as it receives unsanitized input from a command line argument, leading to cleartext transmission. This poses a security risk, potentially allowing an attacker to intercept and access sensitive information during the transmission process.
+*/
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
