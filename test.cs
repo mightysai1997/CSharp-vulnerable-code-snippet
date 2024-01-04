@@ -1,24 +1,41 @@
 using System;
 
+class UserData
+{
+    public string Username { get; set; }
+    public string Password { get; set; }
+    public string Email { get; set; }
+    // Other sensitive personal information fields...
+}
+
 class Program
 {
     static void Main()
     {
-        Console.WriteLine("Generated weak random number: " + GenerateWeakRandomNumber());
+        // Simulating a scenario where user data is accessed without proper authorization
+        string unauthorizedUsername = "attacker";
+
+        // Fetching user data without proper authorization
+        UserData unauthorizedUserData = GetUserInformation(unauthorizedUsername);
+
+        // Displaying unauthorized user data (for educational purposes only)
+        Console.WriteLine($"Unauthorized Access: Username - {unauthorizedUserData.Username}, Email - {unauthorizedUserData.Email}");
     }
 
-    static int GenerateWeakRandomNumber()
+    static UserData GetUserInformation(string username)
     {
-        // True positive: Using a weak source (DateTime.Now.Ticks) for randomness
-        Random random = new Random((int)DateTime.Now.Ticks);
+        // In a secure system, proper authentication and authorization checks should be performed here.
+        // This is a simplified example for educational purposes only.
 
-        // Simulating the use of a random number in a security context
-        // This might represent, for example, generating a temporary authentication token
-        int token = random.Next();
+        // Simulating fetching user data from a database based on the provided username
+        UserData user = new UserData
+        {
+            Username = "legitimateUser",
+            Password = "securePassword123",
+            Email = "user@example.com"
+            // Other sensitive personal information...
+        };
 
-        // Assume that the generated token is used for security-sensitive purposes
-        // ...
-
-        return token;
+        return user;
     }
 }
