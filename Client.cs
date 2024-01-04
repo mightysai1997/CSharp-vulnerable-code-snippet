@@ -1,12 +1,13 @@
-using System.IO;
-using System.IO.Compression;
+using System.Text;
+using System.Web;
+using System.Web.Security;
 
-class Bad
+public class PrivateInformationHandler : IHttpHandler
 {
-    public static void WriteToDirectory(ZipArchiveEntry entry,
-                                        string destDirectory)
+
+    public void ProcessRequest(HttpContext ctx)
     {
-        string destFileName = Path.Combine(destDirectory, entry.FullName);
-        entry.ExtractToFile(destFileName);
+        string address = ctx.Request.QueryString["Address1"];
+        logger.Info("User has address: " + address);
     }
 }
