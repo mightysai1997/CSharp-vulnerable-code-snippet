@@ -1,76 +1,40 @@
 using System;
-using System.Net.Sockets;
-using System.Text;
-
-class Client
-{
-    static void Main()
-    {
-        try
-        {using System;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
+using System.Collections.Generic;
 
 class Program
 {
+    // Vulnerable code: Storing and retrieving personal information without proper access controls
+    static Dictionary<string, string> personalInformation = new Dictionary<string, string>();
+
     static void Main()
     {
-        Console.WriteLine("Enter your password:");
-        string password = Console.ReadLine();
+        Console.WriteLine("Enter your name:");
+        string name = Console.ReadLine();
 
-        // Vulnerable code: Sending password over the network without encryption
-        SendPasswordOverNetwork(password);
+        Console.WriteLine("Enter your sensitive information:");
+        string sensitiveInfo = Console.ReadLine();
+
+        SavePersonalInformation(name, sensitiveInfo);
+
+        // Simulate an unauthorized actor attempting to access personal information
+        UnauthorizedAccessAttempt();
     }
 
-    static void SendPasswordOverNetwork(string password)
+    static void SavePersonalInformation(string name, string sensitiveInfo)
     {
-        try
-        {
-            // Assume server IP and port are properly configured
-            string serverIp = "127.0.0.1";
-            int port = 12345;
-
-            TcpClient client = new TcpClient(serverIp, port);
-            NetworkStream stream = client.GetStream();
-
-            byte[] data = Encoding.ASCII.GetBytes(password);
-            stream.Write(data, 0, data.Length);
-
-            Console.WriteLine("Password sent to the server.");
-
-            stream.Close();
-            client.Close();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Error: " + ex.Message);
-        }
+        // Vulnerable code: Storing personal information without proper access controls
+        personalInformation[name] = sensitiveInfo;
+        Console.WriteLine("Personal information saved successfully.");
     }
-}
 
-            // Connect to the server.
-            TcpClient client = new TcpClient("127.0.0.1", 12345);
+    static void UnauthorizedAccessAttempt()
+    {
+        Console.WriteLine("Unauthorized actor attempting to access personal information:");
 
-            // Get the network stream.
-            NetworkStream stream = client.GetStream();
-
-            // Receive the data from the server.
-            byte[] data = new byte[256];
-            int bytesRead = stream.Read(data, 0, data.Length);
-            string sensitiveInformation = Encoding.ASCII.GetString(data, 0, bytesRead);
-
-            Console.WriteLine("Received sensitive information from the server: " + sensitiveInformation);
-
-            // Clean up the connection.
-            stream.Close();
-            client.Close();
-        }
-        catch (Exception e)
+        // Simulating an unauthorized actor attempting to access personal information
+        foreach (var entry in personalInformation)
         {
-            Console.WriteLine("Exception: " + e.Message);
+            Console.WriteLine($"Name: {entry.Key}, Sensitive Information: {entry.Value}");
         }
-
-        Console.WriteLine("\nClient shutting down...");
     }
 }
