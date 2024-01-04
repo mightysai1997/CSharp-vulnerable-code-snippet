@@ -9,10 +9,16 @@ class Program
 
     static int GenerateWeakRandomNumber()
     {
-        // Vulnerable code: Using DateTime.Now.Ticks as a random seed
+        // True positive: Using a weak source (DateTime.Now.Ticks) for randomness
         Random random = new Random((int)DateTime.Now.Ticks);
 
-        // Simulating the use of a random number
-        return random.Next();
+        // Simulating the use of a random number in a security context
+        // This might represent, for example, generating a temporary authentication token
+        int token = random.Next();
+
+        // Assume that the generated token is used for security-sensitive purposes
+        // ...
+
+        return token;
     }
 }
