@@ -1,30 +1,34 @@
 using System;
-using System.Collections.Generic;
 
-public class UserData
+public class CreditCardData
 {
-    public string Username { get; set; }
-    public string Password { get; set; }
-    public string Email { get; set; }
-    // Other sensitive personal information fields...
+    public string CardNumber { get; set; }
+    public string ExpiryDate { get; set; }
+    public string CVV { get; set; }
+    // Other sensitive credit card information fields...
 }
 
-public class InsecureDatabase
+public class InsecurePaymentProcessor
 {
-    // Simulating an insecure storage mechanism for user data
-    private static List<UserData> userDataStorage = new List<UserData>();
+    // Simulating an insecure payment processor with a static instance holding credit card data
+    private static CreditCardData insecureCreditCardData;
 
-    public static void SaveUserData(UserData user)
+    public static void ProcessPayment(string cardNumber, string expiryDate, string cvv)
     {
-        // Insecurely storing user data without encryption or proper security measures
-        userDataStorage.Add(user);
+        // Insecurely storing credit card data without encryption or secure storage measures
+        insecureCreditCardData = new CreditCardData
+        {
+            CardNumber = cardNumber,
+            ExpiryDate = expiryDate,
+            CVV = cvv
+            // Other sensitive credit card information...
+        };
     }
 
-    public static List<UserData> GetAllUserData()
+    public static CreditCardData GetStoredCreditCardData()
     {
-        // In a secure system, this method should have proper access controls.
-        // This is a simulated insecure scenario for educational purposes only.
-        return userDataStorage;
+        // Simulating an insecure retrieval of stored credit card data
+        return insecureCreditCardData;
     }
 }
 
@@ -32,15 +36,14 @@ public class Program
 {
     public static void Main()
     {
-        // Simulating a scenario where an unauthorized actor retrieves all user data
-        List<UserData> allUsersData = InsecureDatabase.GetAllUserData();
+        // Simulating a scenario where an unauthorized actor retrieves stored credit card data
+        CreditCardData exposedCreditCardData = InsecurePaymentProcessor.GetStoredCreditCardData();
 
-        // Displaying all user data (for educational purposes only)
-        Console.WriteLine("Unauthorized Access: All User Data");
-        foreach (var user in allUsersData)
-        {
-            Console.WriteLine($"Username - {user.Username}, Email - {user.Email}");
-            // Displaying other sensitive personal information...
-        }
+        // Displaying exposed credit card data (for educational purposes only)
+        Console.WriteLine("Unauthorized Access: Exposed Credit Card Data");
+        Console.WriteLine($"Card Number - {exposedCreditCardData.CardNumber}");
+        Console.WriteLine($"Expiry Date - {exposedCreditCardData.ExpiryDate}");
+        Console.WriteLine($"CVV - {exposedCreditCardData.CVV}");
+        // Displaying other sensitive credit card information...
     }
 }
