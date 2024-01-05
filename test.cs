@@ -1,28 +1,28 @@
 using System;
-using System.IO;
-using System.Web;
 
-public class Global : HttpApplication
+class Program
 {
-    void Application_Error(object sender, EventArgs e)
+    static void Main()
     {
-        // Get the last error that occurred
-        Exception exception = Server.GetLastError();
+        // Vulnerable code: Using DateTime.Ticks as a source of randomness
+        long insufficientlyRandomValue = DateTime.Now.Ticks;
 
-        // Log the error (this is just an example; in a real-world scenario, use a proper logging mechanism)
-        LogError(exception);
+        // Simulate a cryptographic operation where this value is used
+        string key = GenerateKey(insufficientlyRandomValue);
 
-        // Clear the error to avoid further processing
-        Server.ClearError();
-
-        // Redirect the user to a generic error page
-        Response.Redirect("~/ErrorPage.aspx");
+        // Attacker can predict the key if they know or can guess the approximate time of execution
+        Console.WriteLine($"Generated Key: {key}");
     }
 
-    private void LogError(Exception ex)
+    static string GenerateKey(long seed)
     {
-        // Log the error to a file (this is just an example; use a proper logging library in production)
-        string logFilePath = Server.MapPath("~/App_Data/ErrorLog.txt");
-        File.AppendAllText(logFilePath, $"[{DateTime.Now}] {ex.ToString()}{Environment.NewLine}");
+        // This is a simplified example; in a real-world scenario, use a proper cryptographic RNG
+        Random random = new Random((int)seed);
+
+        // Generate a key (not secure in this context)
+        byte[] keyBytes = new byte[16];
+        random.NextBytes(keyBytes);
+
+        return BitConverter.ToString(keyBytes).Replace("-", "");
     }
 }
