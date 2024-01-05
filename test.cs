@@ -1,21 +1,31 @@
-using System;
-using System.Runtime.Serialization;
-
-[Serializable]
-public class PersonBad : ISerializable
+// Source: DebugInfoProvider.cs
+public class DebugInfoProvider
 {
-    public int Age;
-
-    public PersonBad(int age)
+    public static string GetSensitiveInformation()
     {
-        if (age < 0)
-            throw new ArgumentException(nameof(age));
-        Age = age;
+        // Simulate fetching sensitive information from a database or other source
+        string sensitiveData = "This is sensitive information.";
+        
+        // In a real-world scenario, you would perform additional checks and validations
+        
+        #if DEBUG
+            // Log the sensitive information only in debug mode
+            Console.WriteLine("Debug Log: " + sensitiveData);
+        #endif
+
+        return sensitiveData;
     }
+}
 
-    [OnDeserializing]
-    void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
+// Sink: HomeController.cs
+public class HomeController : Controller
+{
+    public ActionResult Index()
     {
-        Age = info.GetInt32("age");  // BAD - write is unsafe
+        // Retrieve sensitive information from the source
+        string sensitiveData = DebugInfoProvider.GetSensitiveInformation();
+
+        // Use the sensitive information (in this case, just returning it as part of the view)
+        return View((object)sensitiveData);
     }
 }
