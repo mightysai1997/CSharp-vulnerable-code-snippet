@@ -1,45 +1,28 @@
 using System;
-using System.Xml;
+using System.IO;
+using System.Web;
 
-class Program
+public class Global : HttpApplication
 {
-    static void Main()
+    void Application_Error(object sender, EventArgs e)
     {
-        // Create an XmlDocument
-        XmlDocument doc = new XmlDocument();
+        // Get the last error that occurred
+        Exception exception = Server.GetLastError();
 
-        // Create the XML declaration
-        XmlDeclaration xmlDeclaration = doc.CreateXmlDeclaration("1.0", "utf-8", null);
-        doc.AppendChild(xmlDeclaration);
+        // Log the error (this is just an example; in a real-world scenario, use a proper logging mechanism)
+        LogError(exception);
 
-        // Create the root element <configuration>
-        XmlElement configurationElement = doc.CreateElement("configuration");
-        doc.AppendChild(configurationElement);
+        // Clear the error to avoid further processing
+        Server.ClearError();
 
-        // Create the <system.web> element
-        XmlElement systemWebElement = doc.CreateElement("system.web");
-        configurationElement.AppendChild(systemWebElement);
+        // Redirect the user to a generic error page
+        Response.Redirect("~/ErrorPage.aspx");
+    }
 
-        // Create the <compilation> element with attributes
-        XmlElement compilationElement = doc.CreateElement("compilation");
-        compilationElement.SetAttribute("defaultLanguage", "c#");
-
-        #if DEBUG
-            // Log the fact that we are in debug mode (you can add more sophisticated logging)
-            Console.WriteLine("Application is running in debug mode. Ensure sensitive information is handled appropriately.");
-            compilationElement.SetAttribute("debug", "true");
-        #else
-            // In release mode, do not include debug information
-            compilationElement.SetAttribute("debug", "false");
-        #endif
-
-        systemWebElement.AppendChild(compilationElement);
-
-        // Add more elements or attributes as needed
-
-        // Save the XmlDocument to a file or use it as needed
-        doc.Save("web.config");
-
-        Console.WriteLine("web.config file generated successfully.");
+    private void LogError(Exception ex)
+    {
+        // Log the error to a file (this is just an example; use a proper logging library in production)
+        string logFilePath = Server.MapPath("~/App_Data/ErrorLog.txt");
+        File.AppendAllText(logFilePath, $"[{DateTime.Now}] {ex.ToString()}{Environment.NewLine}");
     }
 }
