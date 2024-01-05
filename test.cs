@@ -1,31 +1,45 @@
-// Source: DebugInfoProvider.cs
-public class DebugInfoProvider
+using System;
+using System.Xml;
+
+class Program
 {
-    public static string GetSensitiveInformation()
+    static void Main()
     {
-        // Simulate fetching sensitive information from a database or other source
-        string sensitiveData = "This is sensitive information.";
-        
-        // In a real-world scenario, you would perform additional checks and validations
-        
+        // Create an XmlDocument
+        XmlDocument doc = new XmlDocument();
+
+        // Create the XML declaration
+        XmlDeclaration xmlDeclaration = doc.CreateXmlDeclaration("1.0", "utf-8", null);
+        doc.AppendChild(xmlDeclaration);
+
+        // Create the root element <configuration>
+        XmlElement configurationElement = doc.CreateElement("configuration");
+        doc.AppendChild(configurationElement);
+
+        // Create the <system.web> element
+        XmlElement systemWebElement = doc.CreateElement("system.web");
+        configurationElement.AppendChild(systemWebElement);
+
+        // Create the <compilation> element with attributes
+        XmlElement compilationElement = doc.CreateElement("compilation");
+        compilationElement.SetAttribute("defaultLanguage", "c#");
+
         #if DEBUG
-            // Log the sensitive information only in debug mode
-            Console.WriteLine("Debug Log: " + sensitiveData);
+            // Log the fact that we are in debug mode (you can add more sophisticated logging)
+            Console.WriteLine("Application is running in debug mode. Ensure sensitive information is handled appropriately.");
+            compilationElement.SetAttribute("debug", "true");
+        #else
+            // In release mode, do not include debug information
+            compilationElement.SetAttribute("debug", "false");
         #endif
 
-        return sensitiveData;
-    }
-}
+        systemWebElement.AppendChild(compilationElement);
 
-// Sink: HomeController.cs
-public class HomeController : Controller
-{
-    public ActionResult Index()
-    {
-        // Retrieve sensitive information from the source
-        string sensitiveData = DebugInfoProvider.GetSensitiveInformation();
+        // Add more elements or attributes as needed
 
-        // Use the sensitive information (in this case, just returning it as part of the view)
-        return View((object)sensitiveData);
+        // Save the XmlDocument to a file or use it as needed
+        doc.Save("web.config");
+
+        Console.WriteLine("web.config file generated successfully.");
     }
 }
